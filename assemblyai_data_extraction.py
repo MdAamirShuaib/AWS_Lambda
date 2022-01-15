@@ -5,8 +5,6 @@ import sys
 import requests
 import json
 from datetime import datetime
-import text2emotion as te
-from vaderSentiment.vaderSentiment import SentimentIntensityAnalyzer
 import string
 import numpy as np
 
@@ -60,20 +58,3 @@ def sentclass(x):
         return "Negative"
     else:
         return "Neutral"
-
-
-def data_generation(df):
-    df['wcount'] = df['utter'].apply(lambda x: len(x.split()))
-    df.reset_index(inplace=True)
-    df.drop('index', axis=1, inplace=True)
-    df['emotion'] = df.utter.apply(lambda x: te.get_emotion(x))
-    df['emotion'] = df.emotion.apply(lambda x: max(x, key=x.get))
-    analyzer = SentimentIntensityAnalyzer()
-    df['senti'] = [analyzer.polarity_scores(x)['compound'] for x in df['utter']]
-    df['senti'] = [sentclass(x) for x in df['senti']]
-    df['compound'] = [analyzer.polarity_scores(x)['compound'] for x in df['utter']]
-    df['positive'] = [analyzer.polarity_scores(x)['pos'] for x in df['utter']]
-    df['negative'] = [analyzer.polarity_scores(x)['neg'] for x in df['utter']]
-    df['neutral'] = [analyzer.polarity_scores(x)['neu'] for x in df['utter']]
-    # df.to_csv('tx_speaker_db.csv', mode='a', header=False, index=False)
-    return df
